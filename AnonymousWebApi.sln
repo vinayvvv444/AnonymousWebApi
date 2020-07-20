@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnonymousWebApi", "AnonymousWebApi\AnonymousWebApi.csproj", "{94E4017B-2738-4EF4-9458-340EFFFEEDB4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2764B987-E2B6-4D60-83E3-787B906546DB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94E4017B-2738-4EF4-9458-340EFFFEEDB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94E4017B-2738-4EF4-9458-340EFFFEEDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94E4017B-2738-4EF4-9458-340EFFFEEDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94E4017B-2738-4EF4-9458-340EFFFEEDB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A433FE38-3B53-4496-8279-7C3121F3D722}
+	EndGlobalSection
+EndGlobal
