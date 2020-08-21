@@ -39,6 +39,11 @@ namespace AnonymousWebApi.Controllers
 
         #region Country master
 
+        /// <summary>
+        /// Add country method
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize]
         [Route("PostCountry")]
