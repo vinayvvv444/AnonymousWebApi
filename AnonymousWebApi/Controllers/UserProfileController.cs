@@ -46,11 +46,36 @@ namespace AnonymousWebApi.Controllers
             };
         }
 
+        [Produces("application/json")]
+        [HttpGet]
+        [Authorize]
+        [Route("GetApplicationUser")]
+        public async Task<IActionResult> GetApplicationUser()
+        {
+            string userId = User.Claims.First(c => c.Type == "UserID").Value;
+            var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
+            
+            return Ok(_mapper.Map<ApplicationUserModel>(user));
+        }
+
         [HttpPost]
+        [Authorize]
         [Route("PostUserAddress")]
         public async Task<IActionResult> AddUserAddress(UserAddressModel model)
         {
             return Ok(await _userAddressRepository.Add(_mapper.Map<UserAddressModel, UserAddress>(model)).ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("GetUserAddresses")]
+        public async Task<IActionResult> GetUserAddresses()
+        {
+            var result = await _userAddressRepository.GetAll().ConfigureAwait(false);
+            
+           
+            var data = _mapper.Map<IEnumerable<UserAddress>,IEnumerable<UserAddressModel>>(result);
+            return Ok(data);
         }
 
         [HttpGet]

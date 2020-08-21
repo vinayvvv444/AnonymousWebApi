@@ -1,5 +1,6 @@
 ﻿using AnonymousWebApi.Data.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace AnonymousWebApi.Data.EFCore
 {
-    public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
+    public abstract class EfCoreRepository<TEntity, TContext> : BaseRepository, IRepository<TEntity>
         where TEntity : class
         where TContext : DbContext
     {
         private readonly TContext context;
-        public EfCoreRepository(TContext context)
+        public EfCoreRepository(IConfiguration configuration, TContext context) : base(configuration)
         {
             this.context = context;
         }
@@ -20,6 +21,13 @@ namespace AnonymousWebApi.Data.EFCore
         {
             context.Set<TEntity>().Add(entity);
             await context.SaveChangesAsync().ConfigureAwait(false);
+            return entity;
+        }
+
+        public TEntity AddSync(TEntity entity)
+        {
+            context.Set<TEntity>().Add(entity);
+            context.SaveChangesAsync();
             return entity;
         }
 

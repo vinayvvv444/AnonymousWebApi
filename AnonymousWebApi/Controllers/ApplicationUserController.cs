@@ -6,7 +6,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AnonymousWebApi.Data.DomainModel;
+using AnonymousWebApi.Helpers.EmailService;
 using AnonymousWebApi.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,12 +24,23 @@ namespace AnonymousWebApi.Controllers
         private UserManager<ApplicationUser> _userManager;
         private SignInManager<ApplicationUser> _singInManager;
         private readonly ApplicationSettings _appSettings;
+        private readonly IBackgroundJobClient _backgroundJobs;
+        private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IEmailSender _emailSender;
 
-        public ApplicationUserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IOptions<ApplicationSettings> appSettings)
+        public ApplicationUserController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IOptions<ApplicationSettings> appSettings,
+            IBackgroundJobClient backgroundJobs,
+            IRecurringJobManager recurringJobManager,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _singInManager = signInManager;
             _appSettings = appSettings.Value;
+            _backgroundJobs = backgroundJobs;
+            _recurringJobManager = recurringJobManager;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
@@ -49,13 +62,19 @@ namespace AnonymousWebApi.Controllers
                 await _userManager.AddToRoleAsync(applicationUser, model.Role).ConfigureAwait(false);
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;
             }
         }
 
+        /// <summary>
+        /// Login service
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Produces("application/json")]
         [HttpPost]
         [Route("Login")]
         //POST : /api/ApplicationUser/Login
@@ -81,6 +100,14 @@ namespace AnonymousWebApi.Controllers
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                 var token = tokenHandler.WriteToken(securityToken);
+                // _backgroundJobs.Enqueue(() => Console.WriteLine("Welcome"));
+                // _backgroundJobs.Schedule(() => Console.WriteLine("scheduled job Welcome"),TimeSpan.FromMinutes(2));
+                //_recurringJobManager.AddOrUpdate("recurring job", () => Console.WriteLine("recurring job"), "* * * * *");
+
+                // var message = new Message(new string[] { "vinayvvv444@gmail.com" }, "Test email", "This is the content from our email.");
+                //_emailSender.SendEmail(message);
+               // _emailSender.SendMail();
+
                 return Ok(new { token });
             }
             else

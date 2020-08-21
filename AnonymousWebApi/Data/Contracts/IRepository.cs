@@ -13,5 +13,7 @@ namespace AnonymousWebApi.Data.Contracts
         Task<T> Update(T entity);
         Task<T> Delete(Guid id);
         Task<T> Get(int id);
+
+        T AddSync(T entity);
     }
 }

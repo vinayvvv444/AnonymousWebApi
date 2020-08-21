@@ -16,6 +16,6 @@ namespace AnonymousWebApi.Models
 
         public string UserId { get; set; }
 
-        public ApplicationUserModel User { get; set; }
+        //public virtual ApplicationUserModel User { get; set; }
     }
 }

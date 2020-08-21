@@ -1,0 +1,56 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/Master/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/master/{catchAll}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Master/GetAllCountry",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/master/countries",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "countries"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Master/GetAllStates",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/master/states",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "states"
+    }
+  ],
+  "Aggregates": [
+    {
+      "RouteKeys": [
+        "countries",
+        "states"
+      ],
+      "UpstreamPathTemplate": "/master/countriesAndstates",
+      "Aggregator": "FakeDefinedAggregator",
+      "UpstreamHttpMethod": [ "Get" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5001"
+  }
+}

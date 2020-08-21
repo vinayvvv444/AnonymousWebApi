@@ -15,6 +15,6 @@ namespace AnonymousWebApi.Data.DomainModel
         [Column(TypeName = "nvarchar(150)")]
         public string HomeNumber { get; set; }
 
-        public IList<UserAddress> UserAddresses { get; set; }
+        public virtual List<UserAddress> UserAddresses { get; } = new List<UserAddress>();
     }
 }
