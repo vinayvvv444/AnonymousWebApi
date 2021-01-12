@@ -36,6 +36,7 @@ namespace AnonymousWebApi.Controllers
         private StateRepository _stateRepository;
         private DistrictRepository _districtRepository;
 
+        ///Master controller
         public MasterController(IMapper mapper,
             CountryRepository countryRepository,
             StateRepository stateRepository,
@@ -62,7 +63,7 @@ namespace AnonymousWebApi.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-       // [Authorize]
+        // [Authorize]
         [Route("PostCountry")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCountry([FromBody] CountryModel model)
@@ -84,7 +85,7 @@ namespace AnonymousWebApi.Controllers
             memoryCache.Set("Countries", memoryCacheCountry);
 
             return Ok(country);
-           
+
         }
 
         [HttpPost]
@@ -108,10 +109,10 @@ namespace AnonymousWebApi.Controllers
         [Route("GetAllCountry")]
         public async Task<IActionResult> GetAllCountries()
         {
-           
+
             var data = await _countryRepository.GetAllCountries().ConfigureAwait(false);
             var mapData = _mapper.Map<IEnumerable<Country>, ICollection<CountryModel>>(data);
-            
+
             return Ok(new { data = mapData, recordsTotal = mapData.Count, recordsFiltered = mapData.Count, draw = 0 });
         }
 
@@ -120,9 +121,9 @@ namespace AnonymousWebApi.Controllers
         public IActionResult GetAllCountriesUsingFromSqlRaw()
         {
             IEnumerable<Country> CountryList;
-            
 
-            if(!memoryCache.TryGetValue("Countries",out CountryList))
+
+            if (!memoryCache.TryGetValue("Countries", out CountryList))
             {
                 var result = _countryRepository.GetAllCountriesUsingFromSqlRaw();
                 memoryCache.Set("Countries", result);
@@ -144,7 +145,7 @@ namespace AnonymousWebApi.Controllers
         }
 
         [HttpGet]
-       
+
         [Route("GetLogs")]
         public IEnumerable<string> Get()
         {
@@ -164,7 +165,7 @@ namespace AnonymousWebApi.Controllers
         public async Task<IActionResult> GetAllCountryUsingEFCore()
         {
             var result = await _countryRepository.GetAll().ConfigureAwait(false);
-            return Ok(_mapper.Map<IEnumerable<Country>,IEnumerable<CountryModel>>(result));
+            return Ok(_mapper.Map<IEnumerable<Country>, IEnumerable<CountryModel>>(result));
         }
 
         [Authorize]
@@ -190,7 +191,7 @@ namespace AnonymousWebApi.Controllers
 
         [HttpPost]
         [Route("GetCountryDT")]
-        public async Task<IActionResult> Post([FromBody]PagingRequest paging)
+        public async Task<IActionResult> Post([FromBody] PagingRequest paging)
         {
             var data = await _countryRepository.GetAllCountries().ConfigureAwait(false);
             var mapData = _mapper.Map<IEnumerable<Country>, IEnumerable<CountryModel>>(data);
@@ -305,7 +306,7 @@ namespace AnonymousWebApi.Controllers
 
         [HttpPost]
         [Route("GetStateDT")]
-        public async Task<IActionResult> GetAllStateDT([FromBody]PagingRequest paging)
+        public async Task<IActionResult> GetAllStateDT([FromBody] PagingRequest paging)
         {
             var data = await _stateRepository.GetAll().ConfigureAwait(false);
             var mapData = _mapper.Map<IEnumerable<State>, IEnumerable<StateModel>>(data);
@@ -334,7 +335,7 @@ namespace AnonymousWebApi.Controllers
                 {
                     // query = _context.Users.Where(emp => emp.Name.Contains(paging.SearchCriteria.Filter) ||
                     //emp.Email.Contains(paging.SearchCriteria.Filter));
-                    query = mapData.Where(x => x.Name.ToLower().Contains(paging.Search.Value.ToLower()) || 
+                    query = mapData.Where(x => x.Name.ToLower().Contains(paging.Search.Value.ToLower()) ||
                     x.CountryModel.Name.ToLower().Contains(paging.Search.Value.ToLower()));
                 }
                 else
@@ -429,22 +430,22 @@ namespace AnonymousWebApi.Controllers
 
         #region Action filter
 
-            [HttpGet]
-            [Route("GetAllCountryForUsingActionFilter")]
+        [HttpGet]
+        [Route("GetAllCountryForUsingActionFilter")]
         public async Task<IActionResult> GetAllCountryForUsingActionFilter()
         {
-            var data =  _mapper.Map<IEnumerable<CountryModel>>(await _countryRepository.GetAllCountries().ConfigureAwait(false));
+            var data = _mapper.Map<IEnumerable<CountryModel>>(await _countryRepository.GetAllCountries().ConfigureAwait(false));
             return Ok(data);
         }
 
         //[HttpGet]
         [HttpGet("GetCountryByIdForUsingActionFilter/{id}", Name = "GetCountryByIdForUsingActionFilter")]
         [ServiceFilter(typeof(ValidateEntityExistsAttribute<Country>))]
-       // [Route("GetCountryByIdForUsingActionFilter")]
+        // [Route("GetCountryByIdForUsingActionFilter")]
         public IActionResult GetCountryByIdForUsingActionFilter(int id)
         {
             var countryData = HttpContext.Items["entity"] as Country;
-            var data =  _mapper.Map<CountryModel>(countryData);
+            var data = _mapper.Map<CountryModel>(countryData);
             return Ok(data);
         }
 
@@ -456,14 +457,14 @@ namespace AnonymousWebApi.Controllers
         [HttpPost]
         // [Authorize]
         [Route("PostDistrict")]
-        public async Task<IActionResult> AddDistrict([FromBody]DistrictModel model)
+        public async Task<IActionResult> AddDistrict([FromBody] DistrictModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var dist = await _districtRepository.Add(_mapper.Map<DistrictModel, District>(model)).ConfigureAwait(false);
-           
+
             return Ok(dist);
 
         }
