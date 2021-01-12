@@ -11,6 +11,10 @@ namespace AnonymousWebApi.Data.EFCore
 {
     public class AnonymousDBContext : IdentityDbContext
     {
+        public AnonymousDBContext()
+        {
+
+        }
         public AnonymousDBContext(DbContextOptions<AnonymousDBContext> options) : base(options)
         {
 
@@ -25,6 +29,8 @@ namespace AnonymousWebApi.Data.EFCore
         public DbSet<Country> MasterCountry { get; set; }
 
         public DbSet<State> MasterState { get; set; }
+
+        public DbSet<District> MasterDistrict { get; set; }
 
         public DbSet<NLogs> NLogs { get; set; }
 

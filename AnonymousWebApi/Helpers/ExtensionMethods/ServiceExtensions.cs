@@ -25,6 +25,7 @@ namespace AnonymousWebApi.Helpers.ExtensionMethods
         public static void ConfigureRepositoryServices(this IServiceCollection services)
         {
             services.AddScoped<StateRepository>();
+            services.AddScoped<DistrictRepository>();
         }
 
         public static void ConfigureQuartzServices(this IServiceCollection services)

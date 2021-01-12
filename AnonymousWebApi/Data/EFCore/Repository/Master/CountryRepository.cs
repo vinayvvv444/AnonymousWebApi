@@ -1,6 +1,7 @@
 ﻿using AnonymousWebApi.Data.Contracts.Master;
 using AnonymousWebApi.Data.DomainModel.Master;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ namespace AnonymousWebApi.Data.EFCore.Repository.Master
     {
         private readonly AnonymousDBContext _context;
         private readonly ICountryCommandText _countryCommandText;
-        public CountryRepository(IConfiguration configuration, ICountryCommandText countryCommandText, AnonymousDBContext context) : base(configuration,context)
+        public CountryRepository(IConfiguration configuration,
+            ICountryCommandText countryCommandText,
+            AnonymousDBContext context) : base(configuration, context)
         {
             _context = context;
             _countryCommandText = countryCommandText;
@@ -35,9 +38,40 @@ namespace AnonymousWebApi.Data.EFCore.Repository.Master
             await WithConnection(async conn =>
             {
                 await conn.ExecuteAsync(_countryCommandText.AddCountry,
-                    new { CreatedUser = entity.CreatedUser, CreatedDate = entity.CreatedDate, UpdatedUser = entity.UpdatedUser, UpdatedDate = entity.UpdatedDate, Name = entity.Name}).ConfigureAwait(false);
+                    new { CreatedUser = entity.CreatedUser, CreatedDate = entity.CreatedDate, UpdatedUser = entity.UpdatedUser, UpdatedDate = entity.UpdatedDate, Name = entity.Name, CountryCode = entity.CountryCode }).ConfigureAwait(false);
             }).ConfigureAwait(false);
 
         }
+
+
+        public IEnumerable<Country> GetAllCountriesUsingFromSqlRaw()
+        {
+            return _context.MasterCountry.FromSqlRaw("select * from MasterCountry").ToList();
+        }
+
+        
+
+        public IEnumerable<Country> GetAllCountriesUsingFromSqlRawSP()
+        {
+            return _context.MasterCountry.FromSqlRaw<Country>("GetAllCountrySP").ToList();
+        }
+
+        public async Task AddCountryUsingTransaction(Country entity)
+        {
+            using(var transaction = _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _context.MasterCountry.AddAsync(entity).ConfigureAwait(false);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    await transaction.Result.CommitAsync().ConfigureAwait(false);
+                }
+                catch(Exception Ex)
+                {
+                    await transaction.Result.RollbackAsync().ConfigureAwait(false);
+                }
+            }
+        }
+
     }
 }

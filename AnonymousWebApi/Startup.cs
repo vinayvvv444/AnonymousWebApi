@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using AnonymousWebApi.ActionFilters;
 using AnonymousWebApi.Data.Contracts;
 using AnonymousWebApi.Data.Contracts.ContratModels;
 using AnonymousWebApi.Data.Contracts.Master;
 using AnonymousWebApi.Data.DomainModel;
+using AnonymousWebApi.Data.DomainModel.Master;
 using AnonymousWebApi.Data.EFCore;
 using AnonymousWebApi.Data.EFCore.Repository;
 using AnonymousWebApi.Data.EFCore.Repository.Master;
@@ -15,13 +19,16 @@ using AnonymousWebApi.Helpers.EmailService;
 using AnonymousWebApi.Helpers.ExtensionMethods;
 using AnonymousWebApi.MappingProfiles;
 using AnonymousWebApi.Models;
+using AnonymousWebApi.Services;
 using AutoMapper;
 using Hangfire;
 using Hangfire.SqlServer;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +55,20 @@ namespace AnonymousWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            /*--------------------------------------------------------------------------------------------------------------------*/
+            /*                      Anti Forgery Token Validation Service                                                         */
+            /* We use the option patterm to configure the Antiforgery feature through the AntiForgeryOptions Class                */
+            /* The HeaderName property is used to specify the name of the header through which antiforgery token will be accepted */
+            /*--------------------------------------------------------------------------------------------------------------------*/
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.SuppressXFrameOptionsHeader = false;
+            });
             services.ConfigureLoggerService();
+
+            services.AddMemoryCache();
+            services.AddMiniProfiler(options => options.RouteBasePath = "/profiler");
             //services.AddProblemDetails();
             services.AddControllers();
 
@@ -102,9 +122,12 @@ namespace AnonymousWebApi
             services.AddTransient<ICountryCommandText, CountryCommandText>();
             services.AddScoped<UserAddressRepository>();
             services.AddScoped<CountryRepository>();
+            services.AddScoped<IShoppingCartService, ShoppingCartService>();
 
             services.ConfigureRepositoryServices();
             services.ConfigureQuartzServices();
+            services.AddScoped<ValidateEntityExistsAttribute<Country>>();
+
 
             var emailConfig = Configuration
          .GetSection("EmailConfiguration")
@@ -180,6 +203,14 @@ namespace AnonymousWebApi
                     ClockSkew = TimeSpan.Zero
                 };
             });
+            services.AddApplicationInsightsTelemetry();
+
+            
+
+            // profiling
+            //services.AddMiniProfiler(options =>
+            //   options.RouteBasePath = "/profiler"
+            //);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -188,8 +219,36 @@ namespace AnonymousWebApi
             IRecurringJobManager recurringJobManager,
             IWebHostEnvironment env,
             IServiceProvider serviceProvider,
-            ILoggerManager logger)
+            ILoggerManager logger,
+            IAntiforgery antiforgery)
         {
+            /* Configure the app to provide a token in a cookie called XSRF-TOKEN */
+            /* Custom Middleware Component is required to Set the cookie which is named XSRF-TOKEN 
+             * The Value for this cookie is obtained from IAntiForgery service
+             * We must configure this cookie with HttpOnly option set to false so that browser will allow JS to read this cookie
+             */
+            app.Use(nextDelegate => context =>
+            {
+                string path = context.Request.Path.Value;
+                //string[] directUrls = { "/admin", "/store", "/cart", "checkout", "/login" };
+                // if (path.StartsWith("/swagger") || path.StartsWith("/api") || string.Equals("/", path))
+                if (string.Equals(path, "/", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/api", StringComparison.OrdinalIgnoreCase))
+                {
+                    //AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions()
+                    {
+                        HttpOnly = false
+                        //Path = "/",
+                        //Secure = true,
+                        //IsEssential = true,
+                        //SameSite = SameSiteMode.Strict
+                    });
+
+                }
+
+                return nextDelegate(context);
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -227,14 +286,22 @@ namespace AnonymousWebApi
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
+                //c.RoutePrefix = "api-doc";
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Anonymous API V1");
+                // this custom html has miniprofiler integration
+                //c.IndexStream = () => GetType().GetTypeInfo().Assembly.GetManifestResourceStream("SwaggerIndex.html");
             });
+
+         
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard();
             });
+
+            // profiling, url to see last profile check: http://localhost:xxxxx/profiler/results
+            app.UseMiniProfiler();
         }
     }
 }

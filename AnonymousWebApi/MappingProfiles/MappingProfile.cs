@@ -27,8 +27,14 @@ namespace AnonymousWebApi.MappingProfiles
             CreateMap<Country, CountryModel>().IgnoreNoMap();
             CreateMap<CountryModel, Country>();
 
-            CreateMap<State, StateModel>().IgnoreNoMap();
+            CreateMap<State, StateModel>().IgnoreNoMap().AfterMap((b, r) =>
+            {
+                r.CountryModel = b.Country;
+            });
             CreateMap<StateModel, State>();
+
+            CreateMap<District, DistrictModel>().IgnoreNoMap();
+            CreateMap<DistrictModel, District>();
         }
     }
 }

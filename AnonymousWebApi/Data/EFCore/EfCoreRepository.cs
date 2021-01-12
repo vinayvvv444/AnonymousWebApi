@@ -1,4 +1,5 @@
 ﻿using AnonymousWebApi.Data.Contracts;
+using AnonymousWebApi.Data.DomainModel.Master;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -50,9 +51,9 @@ namespace AnonymousWebApi.Data.EFCore
             return await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
         }
 
-        public Task<TEntity> Get(int id)
+        public async Task<TEntity> Get(int id)
         {
-            throw new NotImplementedException();
+            return await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
         }
 
         public async Task<List<TEntity>> GetAll()
@@ -65,6 +66,11 @@ namespace AnonymousWebApi.Data.EFCore
             context.Entry(entity).State = EntityState.Modified;
             await context.SaveChangesAsync().ConfigureAwait(false);
             return entity;
+        }
+
+        public async Task<List<TEntity>> GetAllFromSql(string tableName)
+        {
+            return await context.Set<TEntity>().FromSqlRaw($"select * from {tableName}").ToListAsync().ConfigureAwait(false);
         }
 
     }

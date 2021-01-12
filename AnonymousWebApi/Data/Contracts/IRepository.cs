@@ -15,5 +15,7 @@ namespace AnonymousWebApi.Data.Contracts
         Task<T> Get(int id);
 
         T AddSync(T entity);
+
+        Task<List<T>> GetAllFromSql(string tableName);
     }
 }

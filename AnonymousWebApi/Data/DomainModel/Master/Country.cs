@@ -1,4 +1,5 @@
-﻿using AnonymousWebApi.Helpers.Attributes;
+﻿using AnonymousWebApi.Data.Contracts;
+using AnonymousWebApi.Helpers.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AnonymousWebApi.Data.DomainModel.Master
 {
-    public class Country : General
+    public class Country : General, IEntityNew
     {
         //[NoMap]
         public int Id { get; set; }

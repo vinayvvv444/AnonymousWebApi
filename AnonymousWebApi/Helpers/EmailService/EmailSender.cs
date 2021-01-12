@@ -35,7 +35,7 @@ namespace AnonymousWebApi.Helpers.EmailService
             System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587);
             smtp.EnableSsl = true;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new System.Net.NetworkCredential("vinayvalsan2018@gmail.com", "Vin@yvalsan5");
+            smtp.Credentials = new System.Net.NetworkCredential("vinayvalsan2018@gmail.com", "********");
             smtp.Send(mail);
         }
 

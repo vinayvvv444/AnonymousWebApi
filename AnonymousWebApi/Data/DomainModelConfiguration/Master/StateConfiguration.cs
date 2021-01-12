@@ -15,6 +15,10 @@ namespace AnonymousWebApi.Data.DomainModelConfiguration.Master
             builder.ToTable("MasterState");
 
             builder.Property(x => x.Name).HasColumnName("StateName").IsRequired().HasColumnType("nvarchar(450)");
+
+            builder.Property(x => x.CountryId).HasColumnName("CountryId").IsRequired().HasColumnType("int");
+
+            
         }
     }
 }
