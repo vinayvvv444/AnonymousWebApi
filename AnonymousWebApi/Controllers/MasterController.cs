@@ -47,6 +47,7 @@ namespace AnonymousWebApi.Controllers
         ///Master controller
         // master changes
         // user account
+        // stash changes
         public MasterController(IMapper mapper,
             CountryRepository countryRepository,
             StateRepository stateRepository,
