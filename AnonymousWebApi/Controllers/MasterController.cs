@@ -36,7 +36,7 @@ namespace AnonymousWebApi.Controllers
         private StateRepository _stateRepository;
         private DistrictRepository _districtRepository;
 
-        // changes done from development branch
+        // changes done from [ changes from master branch] development branch
 
         ///Master controller
         public MasterController(IMapper mapper,
