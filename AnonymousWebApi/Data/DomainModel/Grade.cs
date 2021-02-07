@@ -11,6 +11,8 @@ namespace AnonymousWebApi.Data.DomainModel
         public string GradeName { get; set; }
         public string Section { get; set; }
 
+        public decimal Mark { get; set; }
+
         public virtual IList<Student> Students { get; }
     }
 }

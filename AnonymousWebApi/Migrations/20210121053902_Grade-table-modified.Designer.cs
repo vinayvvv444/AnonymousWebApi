@@ -4,14 +4,16 @@ using AnonymousWebApi.Data.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AnonymousWebApi.Migrations
 {
     [DbContext(typeof(AnonymousDBContext))]
-    partial class AuthenticationContextModelSnapshot : ModelSnapshot
+    [Migration("20210121053902_Grade-table-modified")]
+    partial class Gradetablemodified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
