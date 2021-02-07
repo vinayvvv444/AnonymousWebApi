@@ -50,6 +50,7 @@ namespace AnonymousWebApi.Controllers
         // stash changes
 
         // new changes from dev branch
+        // new feature changes
         public MasterController(IMapper mapper,
             CountryRepository countryRepository,
             StateRepository stateRepository,
